@@ -1,1 +1,44 @@
+---
+title: "ECO 395 Final Project"
+author: "Annie Nguyen, Tarini Sudhakar, Soo Jee Choi"
+date: "2023-04-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	cache = TRUE
+)
+library(tidyverse)
+
+```
+##  I. Abstract
+
+
+##  II. Introduction
+
+
+##  III. Methods
+
+
+##  IV. Results
+
+
+##  V. Conclusion
+
+
+##  VI. Appendix
+
+
+
+
+
+
+
+
+
+
+
 
