@@ -40,14 +40,14 @@ def get_spotify_features(track, artist):
     songs=sp.search(q='track:'+track+' '+'artist:'+artist+'*' , type='track', market = 'US')
     items = songs['tracks']['items']
     if len(items) ==0:
-        return([0]*len(feature_values))
+        return([0]*len(features))
     else:
         track = items[0]
         song_id = str(track["id"])
         #Use ID to get Song features
         track_features=sp.audio_features(song_id)
         #if len(track_features[0]) <18:
-        #    return([0]*len(feature_values))
+        #    return([0]*len(features))
         if len(track_features[0]) = None:
             continue 
         else:
