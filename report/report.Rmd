@@ -18,6 +18,49 @@ library(tidyverse)
 
 
 ##  II. Introduction
+### Data Sources
+Our data set contains audio and lyric features of the Billboard Top 100 songs from 1980-2015. Data on lyric features were obtained from a publicly available data set by Github user KevinSchaich. The data set analyzed the lyrics of Billboard's Top 100 songs from 1950-2015 using a variety of Natural Language Processing techniques. The variables obtained from this data set are presented below:
+
+* year: Release year of the song
+* position: Position of Billboard's Top 100 for the given year
+* title: Title of the song 
+* artist: Artist of the song
+* pos_sentiment: Positivity association with lyrics. Value ranges between 0-1 inclusive, with 1 being 100% positive.
+* neg_sentiment: Negativity association with lyrics. Value ranges between 0-1 inclusive, with 1 being 100% negative.
+* neut_sentiment: Neutrality association with lyrics. Value ranges between 0-1 inclusive, with 1 being 100% neutral.
+* compound_sentiment: The sum of positive, negative, and neutral scores which is then normalized between -1 (most extreme negative) and +1 (most extreme positive).
+* f_k_grade: Flesch–Kincaid grade level of the song's lyrics. The Flesch-Kincaid Grade Level is equivalent to the US grade level of education.
+* flesch_index: Flesch reading ease score of the song's lyrics. The Flesch reading ease score indicates the understandability of a passage with a number that ranges from 0 to 100. Higher scores indicate that the content is easier to read and understand.
+* fog_index: Gunning-Fog readability index estimates the years of formal education a person needs to understand the text on the first reading. 
+* num_syllables: Number of syllables in lyrics
+* difficult_words: Number of words not on the Dale–Chall "easy" word list
+* num_dupes: Number of duplicate (repetitive) lines in lyrics
+* num_words: Number of words in lyrics
+* num_lines: Number of lines in lyrics
+* genre_tags: song artist's associated genre tags
+
+The positive, negative, neutral, and compound sentiment scores of each song's lyrics were gathered using Python's Natural Language Toolkit (NLTK) VADER model. Readability metrics for each song's lyrics were obtained using the textstat package for Python. Each song artist's associated genre tags were scraped using MusicBrainz API as well as the Musicbrainzng Python interface.
+
+Due to data availability limitations, the data set provides approximately 80-90% coverage for all the songs on Billboard's list from 1950-2015.
+
+We obtain audio features of each song in our billboard data set using Spotify's Web API. The audio features of each song are listed below:
+
+* danceability: Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable.
+* energy: Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. 
+* key: The key the track is in. Integers map to pitches using standard Pitch Class notation.
+* loudness: The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Values typical range between -60 and 0 db.
+* mode: Mode indicates the modality (major or minor) of a track, the type of scale from which its melodic content is derived. Major is represented by 1 and minor is 0.
+* speechiness: Speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording, the closer to 1.0 the attribute value.
+* acousticness: A confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic.
+* instrumentalness: Predicts whether a track contains no vocals. The closer the instrumentalness value is to 1.0, the greater likelihood the track contains no vocal content.
+* liveness: Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. 
+* valence: A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).
+* tempo: The overall estimated tempo of a track in beats per minute (BPM).
+* duration_ms: The duration of the track in milliseconds.
+* time_signature: An estimated overall time signature of a track. The time signature (meter) is a notational convention to specify how many beats are in each bar (or measure).
+
+Observations unable to be found on Spotify are dropped from the data set. The final data set contain () observations and () variables.
+
 
 
 ##  III. Methods
