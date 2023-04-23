@@ -16,6 +16,18 @@ library(dplyr)
 library(rsample)
 library(modelr)
 library(pROC)
+library(foreach)
+library(mosaic)
+library(lubridate)
+library(tibble)
+library(ggcorrplot)
+library(parallel)
+library(caret)
+library(randomForest)
+library(rpart)
+library(rpart.plot)
+library(doParallel)
+
 ```
 
 ##  I. Abstract
@@ -174,13 +186,121 @@ summarize_all(cv_diags, mean)
 
 From the performance metrics, we see that accuracy stays consistent at 99% on average, RMSE is about 5.29, and the AUC is at about 0.7. Although the accuracy score is high and RMSE is consistently low, the AUC indicates that performance can be further improved with a better model. 
 
-
 *Random Forest*
-We tested random forests for 10, 20, and 300 trees. Given the size of the dataset, we used the foreach function on R to train multiple trees on different subsets of the data with a parallel backend from the "doParallel" package. At a cut-off level of 0.5, our random forest models all had a total accuracy rate of ~97%. But with the large number of non-song hits that we have, this is not realistice or a useful measure of accuracy. We want to look at the sensitivity or recall of the model, that is, how many songs have been correctly predicted as hits. 
+We tested random forests for 10, 20, and 300 trees. We split our dataset into a training and test dataset in an 80-20 ratio. Given the size of the dataset, we used the foreach function on R to train multiple trees on different subsets of the data with a parallel backend from the "doParallel" package. At a cut-off level of 0.5, our random forest models all had a total accuracy rate of ~97%. But with the large number of non-song hits that we have, this is not realistice or a useful measure of accuracy. We want to look at the sensitivity or recall of the model, that is, how many songs have been correctly predicted as hits. 
 
-For our model with 10 trees, our in-sample sensitivity is 0.4254017 or 42% and out-of-sample sensitivity is 0.03981265 or 4%. Our mean of squared residuals was 0.01075844. What was more concerning was percentage of variance explained: -34.23. This indicated that our model was performing very poorly, and that we were better off our null model. Increasing the trees to 20 did not help that much. We got in-sample sensitivity of 0.4433818 or 44.3% and out-of-sample sensitivity is 0.04566745 or 4.5%. When we ran it for 300 trees, not much changed. We got percentage of variance explained as -6.46. Mean of squared residuals was 0.008532586. There was minute change in sensitivity, with in-sample increasing to 51.75% and out-of-sample increasing to 5.1%. 
+For our model with 10 trees, our in-sample sensitivity is 0.4254017 or 42% and out-of-sample sensitivity is 0.03981265 or 4%. Our out-of-sample RMSE was 0.0942759. What was more concerning was percentage of variance explained: -34.23. This indicated that our model was performing very poorly, and that we were better off our null model. Increasing the trees to 20 did not help that much. We got in-sample sensitivity of 0.4433818 or 44.3% and out-of-sample sensitivity is 0.04566745 or 4.5%. Out-of-sample RMSE was 0.09235341. When we ran it for 300 trees, not much changed. We got percentage of variance explained as -6.46. Out-of-sample RMSE was again similar to the other models: 0.09063623. There was minute change in sensitivity, with in-sample increasing to 51.75% and out-of-sample increasing to 5.1%. 
 
-Given these results, our random forests model performed quite poorly. Due to computational constraints and little marginal increase in performance, we chose to not increase the number of trees in the model. 
+Given these results, our random forests model performed quite poorly. Due to computational constraints and little marginal increase in performance, we chose to not increase the number of trees in the model. We also modelled a single decision tree, where we got an out-of-sample RMSE of 0.09712917. 
+
+
+```{r echo=FALSE}
+#Splitting into training and testing data
+hits <- read.csv("~/Documents/Coding/winningmusic/hits.csv")
+  
+bb100_split <- initial_split(hits, prop. = 0.8)
+bb100_train <- training(bb100_split)
+bb100_test <- testing(bb100_split)
+
+
+# let's fit a single tree
+bb100.tree = rpart(hit ~ danceability + energy + key + loudness + mode + 
+                     speechiness + acousticness + instrumentalness + liveness +
+                     valence + tempo + duration_ms,
+                   data=bb100_train, na.action = na.omit, control = rpart.control(cp = 0.00001))
+
+cat("In-sample RMSE for single tree: ", modelr::rmse(bb100.tree, bb100_train))
+cat("Out-of-sample RMSE for single tree: ", modelr::rmse(bb100.tree, bb100_test))
+
+##Random forests for 10 trees
+cl <- makeCluster(4)
+registerDoParallel(cl)
+ptm <- proc.time()
+bb100.forest10 <- foreach(ntree=rep(10, 1), .combine=combine, .packages='randomForest') %dopar%
+  randomForest(hit ~ danceability + energy + key + loudness + mode + 
+                 speechiness + acousticness + instrumentalness + liveness +
+                 valence + tempo + duration_ms,  data=bb100_train, 
+               na.action = na.omit, importance = TRUE, ntree=ntree, keep.inbag = TRUE)
+bb100.forest10
+proc.time() - ptm
+stopCluster(cl)
+
+cat("In-sample RMSE for 10 trees: ", modelr::rmse(bb100.forest10, bb100_train))
+cat("Out-of-sample RMSE for 10 trees: ", modelr::rmse(bb100.forest10, bb100_test))
+
+#Confusion matrix for 10 trees
+phat_train_bb10 = predict(bb100.forest10, bb100_train) 
+yhat_train_bb10 = ifelse(phat_train_bb10 > 0.5, 1, 0) 
+confusion_in10 = table(y = bb100_train$hit, yhat = yhat_train_bb10) 
+confusion_in10 #0.4254017 in train set
+cat("In-sample sensitivity for 10 trees: ", 1112/(1112+1502))
+
+phat_test_bb10 = predict(bb100.forest10, bb100_test) 
+yhat_test_bb10 = ifelse(phat_test_bb10 > 0.5, 1, 0) 
+confusion_out10 = table(y = bb100_test$hit, yhat = yhat_test_bb10) 
+confusion_out10 #0.03981265 in test set
+cat("Out-of-sample sensitivity for 10 trees: ", 34/(34+820))
+
+##Random forests for 20 trees
+cl <- makeCluster(4)
+registerDoParallel(cl)
+ptm <- proc.time()
+bb100.forest20 <- foreach(ntree=rep(10, 2), .combine=combine, .packages='randomForest') %dopar%
+  randomForest(hit ~ danceability + energy + key + loudness + mode + 
+                 speechiness + acousticness + instrumentalness + liveness +
+                 valence + tempo + duration_ms,  data=bb100_train, 
+               na.action = na.omit, importance = TRUE, ntree=ntree, keep.inbag = TRUE)
+bb100.forest20
+proc.time() - ptm
+stopCluster(cl)
+
+cat("In-sample RMSE for 20 trees: ", modelr::rmse(bb100.forest20, bb100_train))
+cat("Out-of-sample RMSE for 20 trees: ", modelr::rmse(bb100.forest20, bb100_test))
+
+ensemble20 <- combine(bb100.forest20)
+
+#Confusion matrix for 20 trees
+phat_train_bb20 = predict(ensemble20, bb100_train) 
+yhat_train_bb20 = ifelse(phat_train_bb20 > 0.5, 1, 0) 
+confusion_in20 = table(y = bb100_train$hit, yhat = yhat_train_bb20) 
+confusion_in20 #0.4433818 in train set
+cat("In-sample sensitivity for 20 trees: ", 1159/(1159+1455))
+
+phat_test_bb20 = predict(ensemble20, bb100_test) 
+yhat_test_bb20 = ifelse(phat_test_bb20 > 0.5, 1, 0) 
+confusion_out20 = table(y = bb100_test$hit, yhat = yhat_test_bb20) 
+confusion_out20 #0.04566745 in test set
+cat("Out-of-sample sensitivity for 20 trees: ", 39/(39+815))
+
+# now a random forest for 300 trees
+bb100.forest = randomForest(hit ~ danceability + energy + key + loudness + mode + 
+                              speechiness + acousticness + instrumentalness + liveness +
+                              valence + tempo + duration_ms,
+                            data=bb100_train, ntree=300, importance = TRUE, 
+                            na.action = na.omit)
+plot(bb100.forest)
+# let's compare RMSE on the train set
+cat("In-sample RMSE for 300 trees: ", sqrt(bb100.forest$mse[length(bb100.forest$mse)]))
+
+# let's compare RMSE on the test set
+cat("Out-of-sample RMSE for 300 trees: ", modelr::rmse(bb100.forest, bb100_test))
+
+#Confusion matrix for 300 trees
+phat_train_bb1 = predict(bb100.forest, bb100_train) 
+yhat_train_bb1 = ifelse(phat_train_bb1 > 0.5, 1, 0) 
+confusion_in300 = table(y = bb100_train$hit, yhat = yhat_train_bb1) 
+confusion_in300 #51.75% in train set
+cat("In-sample sensitivity for 300 trees: ", 1353/(1353+1261))
+
+phat_test_bb1 = predict(bb100.forest, bb100_test) 
+yhat_test_bb1 = ifelse(phat_test_bb2 > 0.5, 1, 0) 
+confusion_out300 = table(y = bb100_test$hit, yhat = yhat_test_bb1) 
+confusion_out300 #5.1% in test set
+cat("Out-of-sample sensitivity for 300 trees: ", 44/(44+810))
+
+vi = varImpPlot(bb100.forest, type=1) #valence is the most important 
+
+```
 
 ## IV. Patterns 
 Principal Component Analysis (PCA) is a dimensionality reduction technique that can be used to identify patterns and trends in high-dimensional datasets. In the context of hit song prediction, we can use PCA to analyze how the audio and lyric features of top and bottom billboard hits have changed across decades.
