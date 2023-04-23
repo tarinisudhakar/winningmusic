@@ -1,8 +1,8 @@
 ---
 title: "ECO 395 Final Project"
-author: "Annie Nguyen, Tarini Sudhakar, Soo Jee Choi"
+author: "Soo Jee Choi, Annie Nguyen, Tarini Sudhakar"
 date: "2023-04-10"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -14,12 +14,29 @@ knitr::opts_chunk$set(
 library(tidyverse)
 
 ```
-##  I. Abstract
 
+##  I. Abstract
+How do you make a hit song? Intuitively, a hit song should have a good beat, a catchy hook, and not-too-complicated lyrics. But we can do better than that, given the amount of data surrounding us. Spotify has been able to break a song into features such as energy, tempo, acoustics, and much more. Using these features for songs released between 1985 to 2015, we predict whether a song will make to Billboard Top 100 in the USA. We run both a logistic regression and random forests model: random forests emerges as the clear winner with X% accuracy. We also evaluate how features of a top 10 Billboard hit change over this time period, including lyric analysis. Our biggest contribution is creating a dataset with Billboard hit songs and non-hit songs from 1985 to 2015, containing Spotify audio features.  
 
 ##  II. Introduction
+
+Hit song science is the possibility of predicting whether a song will be a hit before it is distributed (see [here](https://store.hbr.org/product/polyphonic-hmi-mixing-music-and-math/506009?sku=506009-PDF-ENG&N=4294935875%25204294934972). Knowing what kind of features go into a hit song help musicians, record labels, and music vendors generate larger revenues. It also increases the reach of an artist. For instance, if a record label knows that a song with particular features such as high tempo and repeated words, will have a better shot being popular, they would put more resources behind that. Similarly, a song with higher acoustic features will only appeal to certain audiences and not have mainstream appeal. 
+
+We compiled a dataset of songs from 1985 to 2015, both Billboard Top 100 and non-hits, with their audio features from Spotify. We used the dataset built by Yamac Eren Ay on [Kaggle](https://www.kaggle.com/datasets/yamaerenay/spotify-dataset-19212020-600k-tracks) as the master dataset. We added a dummy variable `billboard_hit` to indicate whether a song had been on the Billboard Top 100. For Billboard Top 100 songs, we also added lyric features from a publicly available data set by Github user `KevinSchaich`. You can find a detailed description of the dataset in Appendix 1. 
+
+We asked two questions: 
+  1. Can we predict which song will become a Billboard Top 100 hit? 
+  2. How have Top 10 Billboard hits changed over time? 
+  
+For the first question, we followed the methodology laid down by Middlebrook and Sheik ([2019](https://www.arxiv-vanity.com/papers/1908.08609/)). They build four prediction models: logistic regression, neural network, random forests, and support vector machine. We used logistic regression and random forests for our analysis. 
+
+For the second question, we evaluated how audio and lyric features have changed of hit songs over time. 
+
+
+
+## Appendix 1
 ### Data Sources
-Our data set contains audio and lyric features of the Billboard Top 100 songs from 1980-2015. Data on lyric features were obtained from a publicly available data set by Github user KevinSchaich. The data set analyzed the lyrics of Billboard's Top 100 songs from 1950-2015 using a variety of Natural Language Processing techniques. The variables obtained from this data set are presented below:
+The data set analyzed the lyrics of Billboard's Top 100 songs from 1950-2015 using a variety of Natural Language Processing techniques. The variables obtained from this data set are presented below:
 
 * year: Release year of the song
 * position: Position of Billboard's Top 100 for the given year
@@ -60,8 +77,6 @@ We obtain audio features of each song in our billboard data set using Spotify's 
 * time_signature: An estimated overall time signature of a track. The time signature (meter) is a notational convention to specify how many beats are in each bar (or measure).
 
 Observations unable to be found on Spotify are dropped from the data set. The final data set contain () observations and () variables.
-
-
 
 ##  III. Methods
 
