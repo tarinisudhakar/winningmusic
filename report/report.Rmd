@@ -22,17 +22,34 @@ How do you make a hit song? Intuitively, a hit song should have a good beat, a c
 
 Hit song science is the possibility of predicting whether a song will be a hit before it is distributed (see [here](https://store.hbr.org/product/polyphonic-hmi-mixing-music-and-math/506009?sku=506009-PDF-ENG&N=4294935875%25204294934972). Knowing what kind of features go into a hit song help musicians, record labels, and music vendors generate larger revenues. It also increases the reach of an artist. For instance, if a record label knows that a song with particular features such as high tempo and repeated words, will have a better shot being popular, they would put more resources behind that. Similarly, a song with higher acoustic features will only appeal to certain audiences and not have mainstream appeal. 
 
-We compiled a dataset of songs from 1985 to 2015, both Billboard Top 100 and non-hits, with their audio features from Spotify. We used the dataset built by Yamac Eren Ay on [Kaggle](https://www.kaggle.com/datasets/yamaerenay/spotify-dataset-19212020-600k-tracks) as the master dataset. We added a dummy variable `billboard_hit` to indicate whether a song had been on the Billboard Top 100. For Billboard Top 100 songs, we also added lyric features from a publicly available data set by Github user `KevinSchaich`. You can find a detailed description of the dataset in Appendix 1. 
+We compiled a dataset of songs from 1958 to 2015, both Billboard Top 100 and non-hits, with their audio features from Spotify. We used the dataset built by Yamac Eren Ay on [Kaggle](https://www.kaggle.com/datasets/yamaerenay/spotify-dataset-19212020-600k-tracks) as the master dataset. We added a dummy variable `billboard_hit` to indicate whether a song had been on the Billboard Top 100. For Billboard Top 100 songs, we also added lyric features from a publicly available data set by Github user `KevinSchaich`. You can find a detailed description of the dataset in Appendix 1. 
 
 We asked two questions: 
   1. Can we predict which song will become a Billboard Top 100 hit? 
   2. How have Top 10 Billboard hits changed over time? 
   
-For the first question, we followed the methodology laid down by Middlebrook and Sheik ([2019](https://www.arxiv-vanity.com/papers/1908.08609/)). They build four prediction models: logistic regression, neural network, random forests, and support vector machine. We used logistic regression and random forests for our analysis. 
+For the first question, we followed the methodology laid down by Middlebrook and Sheik ([2019](https://www.arxiv-vanity.com/papers/1908.08609/)). They build four prediction models for songs from 1985 to 2015: logistic regression, neural network, random forests, and support vector machine. We use logistic regression and random forests for our analysis. 
 
-For the second question, we evaluated how audio and lyric features have changed of hit songs over time. 
+*Logistic regression* models the probability of a binary outcome based on a set of input variables. In our case, the binary outcome is whether a song is a Billboard Top 100 hit, and the input variables are the various audio features extracted from the song. **We will train several logistic regression models using different subsets of features and evaluate their performance in terms of accuracy, precision, recall, and F1 score.**
 
+*Random forests*, is an ensemble-learning algorithm that combines multiple decision trees to improve predictive performance. Each decision tree is trained on a random subset of features and samples, and the final prediction is based on the majority vote of the individual trees. We will explore the use of random forests for hit song prediction and compare its performance with logistic regression.
 
+For the second question, we evaluated how audio and lyric features have changed of hit songs over time. We compared the Top 10 Billboard hits with the Bottom 10 (90-100 ranks) using Principal Component Analysis. 
+
+## III. Hit song prediction 
+
+## IV. Patterns 
+Principal Component Analysis (PCA) is a popular dimensionality reduction technique that can be used to identify patterns and trends in high-dimensional datasets. In the context of hit song prediction, we can use PCA to analyze how the audio and lyric features of top and bottom billboard hits have changed across decades.
+
+First, we gather a large dataset of songs released over several decades, including both top and bottom billboard hits. We then extract various audio features such as tempo, loudness, and danceability, as well as lyric features such as sentiment and complexity, from the songs using the Spotify Web API and natural language processing techniques.
+
+Next, we use PCA to reduce the dimensionality of the dataset by projecting it onto a lower-dimensional subspace while preserving as much of the original variability as possible. This allows us to visualize the relationships between the different features and identify the most important factors that contribute to a song's success.
+
+We can then plot the first two principal components against each other and color-code the points based on their decade of release. This visualization can help us identify how the audio and lyric features of top and bottom billboard hits have changed over time and whether there are any consistent patterns or trends.
+
+For example, we might observe that songs released in the 1960s have a different distribution of audio and lyric features than songs released in the 2010s. We might also observe that certain features, such as tempo or sentiment, are consistently more important for predicting a song's success across all decades.
+
+Overall, using PCA to analyze how the audio and lyric features of top and bottom billboard hits have changed across decades can provide valuable insights into the evolution of popular music and help inform future hit song predictions.
 
 ## Appendix 1
 ### Data Sources
