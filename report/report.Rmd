@@ -25,65 +25,27 @@ How do you make a hit song? Intuitively, a hit song should have a good beat, a c
 
 Hit song science is the possibility of predicting whether a song will be a hit before it is distributed (see [here](https://store.hbr.org/product/polyphonic-hmi-mixing-music-and-math/506009?sku=506009-PDF-ENG&N=4294935875%25204294934972). Knowing what kind of features go into a hit song help musicians, record labels, and music vendors generate larger revenues. It also increases the reach of an artist. For instance, if a record label knows that a song with particular features such as high tempo and repeated words, will have a better shot being popular, they would put more resources behind that. Similarly, a song with higher acoustic features will only appeal to certain audiences and not have mainstream appeal. 
 
-We compiled a dataset of songs from 1985 to 2015, both Billboard Top 100 and non-hits, with their audio features from Spotify. We used the dataset built by Yamac Eren Ay on [Kaggle](https://www.kaggle.com/datasets/yamaerenay/spotify-dataset-19212020-600k-tracks) as the master dataset. We added a dummy variable `billboard_hit` to indicate whether a song had been on the Billboard Top 100. For Billboard Top 100 songs, we also added lyric features from a publicly available data set by Github user `KevinSchaich`. You can find a detailed description of the dataset in Appendix 1. 
+We compiled a dataset of songs from 1958 to 2015, both Billboard Top 100 and non-hits, with their audio features from Spotify. We used the dataset built by Yamac Eren Ay on [Kaggle](https://www.kaggle.com/datasets/yamaerenay/spotify-dataset-19212020-600k-tracks) as the master dataset. We added a dummy variable `billboard_hit` to indicate whether a song had been on the Billboard Top 100. For Billboard Top 100 songs, we also added lyric features from a publicly available data set by Github user `KevinSchaich`. You can find a detailed description of the dataset in Appendix 1. 
 
 We asked two questions: 
   1. Can we predict which song will become a Billboard Top 100 hit? 
   2. How have Top 10 Billboard hits changed over time? 
   
-For the first question, we followed the methodology laid down by Middlebrook and Sheik ([2019](https://www.arxiv-vanity.com/papers/1908.08609/)). They build four prediction models: logistic regression, neural network, random forests, and support vector machine. We used logistic regression and random forests for our analysis. 
+For the first question, we followed the methodology laid down by Middlebrook and Sheik ([2019](https://www.arxiv-vanity.com/papers/1908.08609/)). They build four prediction models for songs from 1985 to 2015: logistic regression, neural network, random forests, and support vector machine. We use logistic regression and random forests for our analysis. 
 
-For the second question, we evaluated how audio and lyric features have changed of hit songs over time. 
+*Logistic regression* models the probability of a binary outcome based on a set of input variables. In our case, the binary outcome is whether a song is a Billboard Top 100 hit, and the input variables are the various audio features extracted from the song. **We will train several logistic regression models using different subsets of features and evaluate their performance in terms of accuracy, precision, recall, and F1 score.**
 
+*Random forests* combines multiple decision trees to improve predictive performance. Each decision tree is trained on a random subset of features and samples, and the final prediction is based on the majority vote of the individual trees. We will explore the use of random forests for hit song prediction and compare its performance with logistic regression.
 
-
-## Appendix 1
-### Data Sources
-The data set analyzed the lyrics of Billboard's Top 100 songs from 1950-2015 using a variety of Natural Language Processing techniques. The variables obtained from this data set are presented below:
-
-* year: Release year of the song
-* position: Position of Billboard's Top 100 for the given year
-* title: Title of the song 
-* artist: Artist of the song
-* pos_sentiment: Positivity association with lyrics. Value ranges between 0-1 inclusive, with 1 being 100% positive.
-* neg_sentiment: Negativity association with lyrics. Value ranges between 0-1 inclusive, with 1 being 100% negative.
-* neut_sentiment: Neutrality association with lyrics. Value ranges between 0-1 inclusive, with 1 being 100% neutral.
-* compound_sentiment: The sum of positive, negative, and neutral scores which is then normalized between -1 (most extreme negative) and +1 (most extreme positive).
-* f_k_grade: Flesch–Kincaid grade level of the song's lyrics. The Flesch-Kincaid Grade Level is equivalent to the US grade level of education.
-* flesch_index: Flesch reading ease score of the song's lyrics. The Flesch reading ease score indicates the understandability of a passage with a number that ranges from 0 to 100. Higher scores indicate that the content is easier to read and understand.
-* fog_index: Gunning-Fog readability index estimates the years of formal education a person needs to understand the text on the first reading. 
-* num_syllables: Number of syllables in lyrics
-* difficult_words: Number of words not on the Dale–Chall "easy" word list
-* num_dupes: Number of duplicate (repetitive) lines in lyrics
-* num_words: Number of words in lyrics
-* num_lines: Number of lines in lyrics
-* genre_tags: song artist's associated genre tags
-
-The positive, negative, neutral, and compound sentiment scores of each song's lyrics were gathered using Python's Natural Language Toolkit (NLTK) VADER model. Readability metrics for each song's lyrics were obtained using the textstat package for Python. Each song artist's associated genre tags were scraped using MusicBrainz API as well as the Musicbrainzng Python interface.
-
-Due to data availability limitations, the data set provides approximately 80-90% coverage for all the songs on Billboard's list from 1950-2015.
-
-We obtain audio features of each song in our billboard data set using Spotify's Web API. The audio features of each song are listed below:
-
-* danceability: Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable.
-* energy: Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. 
-* key: The key the track is in. Integers map to pitches using standard Pitch Class notation.
-* loudness: The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Values typical range between -60 and 0 db.
-* mode: Mode indicates the modality (major or minor) of a track, the type of scale from which its melodic content is derived. Major is represented by 1 and minor is 0.
-* speechiness: Speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording, the closer to 1.0 the attribute value.
-* acousticness: A confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic.
-* instrumentalness: Predicts whether a track contains no vocals. The closer the instrumentalness value is to 1.0, the greater likelihood the track contains no vocal content.
-* liveness: Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. 
-* valence: A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).
-* tempo: The overall estimated tempo of a track in beats per minute (BPM).
-* duration_ms: The duration of the track in milliseconds.
-* time_signature: An estimated overall time signature of a track. The time signature (meter) is a notational convention to specify how many beats are in each bar (or measure).
-
-Observations unable to be found on Spotify are dropped from the data set. The final data set contain () observations and () variables.
+For the second question, we evaluated how audio and lyric features have changed of hit songs over time. We compared the Top 10 Billboard hits with the Bottom 10 (90-100 ranks) using Principal Component Analysis. 
 
 ##  III. Methods
 
-### Logistic Regression Model
+##  IV. Results
+
+## III. Hit song prediction 
+
+*Logistic Regression*
 
 First, we build a logistic regression model to predict which song will become a Billboard Top 100 hit. `hit` is the binary variable in which 1 indicates that a song made it onto the Billboard 100 and 0 indicates that the song was not on the Billboard 100.
 
@@ -213,17 +175,73 @@ summarize_all(cv_diags, mean)
 From the performance metrics, we see that accuracy stays consistent at 99% on average, RMSE is about 5.29, and the AUC is at about 0.7. Although the accuracy score is high and RMSE is consistently low, the AUC indicates that performance can be further improved with a better model. 
 
 
-### Random Forest
+*Random Forest*
+We tested random forests for 10, 20, and 300 trees. Given the size of the dataset, we used the foreach function on R to train multiple trees on different subsets of the data with a parallel backend from the "doParallel" package. At a cut-off level of 0.5, our random forest models all had a total accuracy rate of ~97%. But with the large number of non-song hits that we have, this is not realistice or a useful measure of accuracy. We want to look at the sensitivity or recall of the model, that is, how many songs have been correctly predicted as hits. 
 
+For our model with 10 trees, our in-sample sensitivity is 0.4254017 or 42% and out-of-sample sensitivity is 0.03981265 or 4%. Our mean of squared residuals was 0.01075844. What was more concerning was percentage of variance explained: -34.23. This indicated that our model was performing very poorly, and that we were better off our null model. Increasing the trees to 20 did not help that much. We got in-sample sensitivity of 0.4433818 or 44.3% and out-of-sample sensitivity is 0.04566745 or 4.5%. When we ran it for 300 trees, not much changed. We got percentage of variance explained as -6.46. Mean of squared residuals was 0.008532586. There was minute change in sensitivity, with in-sample increasing to 51.75% and out-of-sample increasing to 5.1%. 
 
+Given these results, our random forests model performed quite poorly. Due to computational constraints and little marginal increase in performance, we chose to not increase the number of trees in the model. 
 
-##  IV. Results
+## IV. Patterns 
+Principal Component Analysis (PCA) is a dimensionality reduction technique that can be used to identify patterns and trends in high-dimensional datasets. In the context of hit song prediction, we can use PCA to analyze how the audio and lyric features of top and bottom billboard hits have changed across decades.
 
+First, we gathered a large dataset of songs released over several decades, including both top and bottom billboard hits. We then extract various audio features such as tempo, loudness, and danceability, as well as lyric features such as sentiment and complexity, from the songs using the Spotify Web API and natural language processing techniques.
+
+Next, we use PCA to reduce the dimensionality of the dataset by projecting it onto a lower-dimensional subspace while preserving as much of the original variability as possible. This allows us to visualize the relationships between the different features and identify the most important factors that contribute to a song's success.
+
+We can then plot the first two principal components against each other and color-code the points based on their decade of release. This visualization can help us identify how the audio and lyric features of top and bottom billboard hits have changed over time and whether there are any consistent patterns or trends.
+
+For example, we might observe that songs released in the 1960s have a different distribution of audio and lyric features than songs released in the 2010s. We might also observe that certain features, such as tempo or sentiment, are consistently more important for predicting a song's success across all decades.
+
+Overall, using PCA to analyze how the audio and lyric features of top and bottom billboard hits have changed across decades can provide valuable insights into the evolution of popular music and help inform future hit song predictions.
 
 ##  V. Conclusion
 
+## Appendix 1
+### Data Sources
+The data set analyzed the lyrics of Billboard's Top 100 songs from 1950-2015 using a variety of Natural Language Processing techniques. The variables obtained from this data set are presented below:
 
-##  VI. Appendix
+* year: Release year of the song
+* position: Position of Billboard's Top 100 for the given year
+* title: Title of the song 
+* artist: Artist of the song
+* pos_sentiment: Positivity association with lyrics. Value ranges between 0-1 inclusive, with 1 being 100% positive.
+* neg_sentiment: Negativity association with lyrics. Value ranges between 0-1 inclusive, with 1 being 100% negative.
+* neut_sentiment: Neutrality association with lyrics. Value ranges between 0-1 inclusive, with 1 being 100% neutral.
+* compound_sentiment: The sum of positive, negative, and neutral scores which is then normalized between -1 (most extreme negative) and +1 (most extreme positive).
+* f_k_grade: Flesch–Kincaid grade level of the song's lyrics. The Flesch-Kincaid Grade Level is equivalent to the US grade level of education.
+* flesch_index: Flesch reading ease score of the song's lyrics. The Flesch reading ease score indicates the understandability of a passage with a number that ranges from 0 to 100. Higher scores indicate that the content is easier to read and understand.
+* fog_index: Gunning-Fog readability index estimates the years of formal education a person needs to understand the text on the first reading. 
+* num_syllables: Number of syllables in lyrics
+* difficult_words: Number of words not on the Dale–Chall "easy" word list
+* num_dupes: Number of duplicate (repetitive) lines in lyrics
+* num_words: Number of words in lyrics
+* num_lines: Number of lines in lyrics
+* genre_tags: song artist's associated genre tags
+
+The positive, negative, neutral, and compound sentiment scores of each song's lyrics were gathered using Python's Natural Language Toolkit (NLTK) VADER model. Readability metrics for each song's lyrics were obtained using the textstat package for Python. Each song artist's associated genre tags were scraped using MusicBrainz API as well as the Musicbrainzng Python interface.
+
+Due to data availability limitations, the data set provides approximately 80-90% coverage for all the songs on Billboard's list from 1950-2015.
+
+We obtain audio features of each song in our billboard data set using Spotify's Web API. The audio features of each song are listed below:
+
+* danceability: Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable.
+* energy: Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. 
+* key: The key the track is in. Integers map to pitches using standard Pitch Class notation.
+* loudness: The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Values typical range between -60 and 0 db.
+* mode: Mode indicates the modality (major or minor) of a track, the type of scale from which its melodic content is derived. Major is represented by 1 and minor is 0.
+* speechiness: Speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording, the closer to 1.0 the attribute value.
+* acousticness: A confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic.
+* instrumentalness: Predicts whether a track contains no vocals. The closer the instrumentalness value is to 1.0, the greater likelihood the track contains no vocal content.
+* liveness: Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. 
+* valence: A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).
+* tempo: The overall estimated tempo of a track in beats per minute (BPM).
+* duration_ms: The duration of the track in milliseconds.
+* time_signature: An estimated overall time signature of a track. The time signature (meter) is a notational convention to specify how many beats are in each bar (or measure).
+
+Observations unable to be found on Spotify are dropped from the data set. The final data set contain () observations and () variables.
+
+
 
 
 
