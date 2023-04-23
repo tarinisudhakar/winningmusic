@@ -12,7 +12,10 @@ knitr::opts_chunk$set(
 	cache = TRUE
 )
 library(tidyverse)
-
+library(dplyr)
+library(rsample)
+library(modelr)
+library(pROC)
 ```
 
 ##  I. Abstract
@@ -79,6 +82,139 @@ We obtain audio features of each song in our billboard data set using Spotify's 
 Observations unable to be found on Spotify are dropped from the data set. The final data set contain () observations and () variables.
 
 ##  III. Methods
+
+### Logistic Regression Model
+
+First, we build a logistic regression model to predict which song will become a Billboard Top 100 hit. `hit` is the binary variable in which 1 indicates that a song made it onto the Billboard 100 and 0 indicates that the song was not on the Billboard 100.
+
+We will compare the out-of-sample performance of the following models:
+
+  1. Baseline Model: a small model that uses only the `duration_ms`, `danceability`, `energy`, `key`, `loudness`, `speechiness`, `acousticness`, `instrumentalness`, `liveness`, `valence`, `tempo`, and `time_signature` variables as features with no interaction terms.
+  2. Refined Model: a logistic regression model built using the forward selection process. The forward selection process considers all of the candidate variables listed above and interaction terms.
+
+
+```{r include=FALSE}
+## CLASSIFICATION DIAGNOSIS
+class_diag <- function(score, truth, model, test_set, positive, cutoff=.5){
+  pred <- factor(score>cutoff,levels=c("TRUE","FALSE"))
+  truth <- factor(truth==positive, levels=c("TRUE","FALSE"))
+  tab<-table(truth, pred)
+  acc=sum(diag(tab))/sum(tab)
+  ppv=tab[1,1]/colSums(tab)[1]
+  rmse_ = rmse(model, test_set)
+  
+  #CALCULATE EXACT AUC
+  truth<-as.numeric(truth=="TRUE")
+  ord<-order(score, decreasing=TRUE)
+  score <- score[ord]; truth <- truth[ord]
+  TPR=cumsum(truth)/max(1,sum(truth))
+  FPR=cumsum(!truth)/max(1,sum(!truth))
+  dup<-c(score[-1]>=score[-length(score)], FALSE)
+  TPR<-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1)
+  n <- length(TPR)
+  auc<- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+  round(data.frame(acc, rmse_, auc, row.names = "Metrics"),5)
+}
+```
+
+
+#### Model Building
+
+##### Baseline Model:
+
+After running the baseline logistic regression model, we test for out-of-sample performance measures and see that it gives us an accuracy of 99.1%, an RMSE of about 5.295, and an AUC of 0.696
+
+```{r echo=FALSE}
+data_hits <- read.csv("../analysis/hits.csv") %>% select(-X) %>% drop_na(duration_ms)
+set.seed(500)
+hits_split = initial_split(data_hits, prop=0.8)
+hits_train = training(hits_split)
+hits_test = testing(hits_split)
+model1 = glm(hit ~ duration_ms + danceability + energy + key + loudness + speechiness + 
+               acousticness + instrumentalness + liveness + valence + tempo + time_signature, 
+             data = hits_train, family = "binomial")
+prob_model1 = predict(model1, newdata = hits_test, type = "response")
+# out-of-sample accuracy
+class_diag(prob_model1, hits_test$hit, model1, hits_test, positive = 1)
+```
+
+
+##### Refined Model:
+
+We build another logistic regression model using the forward selection process to get a model that includes the candidate variables and various combinations of interaction terms. Although accuracy remains the same and the RMSE score increases, we see that there is improvement in the AUC, which shows that the refined model does a better job predicting whether a song will be a Billboard hit or not.
+
+```{r echo=FALSE}
+model2 = glm(hit ~ acousticness + instrumentalness + danceability + speechiness + 
+               liveness + time_signature + valence + loudness + energy + 
+               tempo + duration_ms + key + acousticness:speechiness + acousticness:danceability + 
+               liveness:valence + valence:loudness + speechiness:loudness + 
+               acousticness:energy + acousticness:loudness + valence:energy + 
+               loudness:energy + acousticness:time_signature + instrumentalness:valence + 
+               acousticness:instrumentalness + speechiness:liveness + danceability:time_signature + 
+               danceability:valence + danceability:tempo + speechiness:tempo + 
+               danceability:energy + danceability:loudness + speechiness:energy + 
+               loudness:tempo + acousticness:liveness + danceability:speechiness + 
+               acousticness:duration_ms + danceability:duration_ms + loudness:duration_ms + 
+               instrumentalness:duration_ms + acousticness:valence + speechiness:duration_ms + 
+               liveness:key + energy:key + instrumentalness:speechiness + 
+               liveness:energy, 
+             data=hits_train, family = "binomial")
+prob_model2 = predict(model2, newdata = hits_test, type= "response")
+# out-of-sample accuracy
+class_diag(prob_model2, hits_test$hit, model2, hits_test, positive = 1)
+```
+
+Although accuracy is about as good as the baseline model and the AUC is improved, it is important to note that the baseline model is more parsimonious, and the trade-off between accuracy and parsimony is not substantial enough to justify using the refined model. In our case, we will stick to using the baseline model for analysis.
+
+#### Model validation:
+
+The following is an ROC plot for the Baseline Model, using the test dataset:
+
+```{r logistic_roc, echo=FALSE}
+roc_model1 <- roc(hits_test$hit, prob_model1)
+ggroc(roc_model1) + labs(title ="ROC Curve")
+```
+
+An ROC plots TPR vs. FPR. TPR is another name for sensitivity, while FPR is defined as (1-specificity), which explains why the numbers on the x-axis are flipped with 1 on the left and 0 on the right.
+
+#### 10-Fold Cross Validation
+
+In this step, we perform 10-fold cross validation for our baseline logistic regression model. For each fold, we will calculate the performance metrics, which includes accuracy, RMSE, and AUC values.
+
+**The results for each fold is as follows:**
+
+```{r logistic_cv, echo=FALSE}
+k = 10
+folds <- rep(1:k, length.out = nrow(data_hits))
+diags <- NULL
+i = 1
+for (i in 1:k) {
+  train <- data_hits[folds != i, ]
+  test <- data_hits[folds == i, ]
+  truth <- test$hit
+  
+  fit <- glm(hit == 1 ~ duration_ms + danceability + energy + key + loudness + speechiness + 
+               acousticness + instrumentalness + liveness + valence + tempo + time_signature, 
+                     data = train, family = "binomial")
+  probs <- predict(fit, newdata = test, type = "response")
+  #probs <- ifelse(probs > 0.5, 1, 0)
+  diags <- rbind(diags, class_diag(probs, truth, fit, test, positive = 1))
+}
+diags
+```
+
+**Average of performance metrics across 10 folds:**
+
+```{r echo=FALSE}
+# average performance metrics across all folds
+summarize_all(cv_diags, mean)
+```
+
+From the performance metrics, we see that accuracy stays consistent at 99% on average, RMSE is about 5.29, and the AUC is at about 0.7. Although the accuracy score is high and RMSE is consistently low, the AUC indicates that performance can be further improved with a better model. 
+
+
+### Random Forest
+
 
 
 ##  IV. Results
