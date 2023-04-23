@@ -45,7 +45,11 @@ For the second question, we evaluated how audio and lyric features have changed 
 *Logistic Regression*
 
 *Random Forest*
-We tested random forests for 10, 20, 300, and 500 trees. Given the size of the dataset, we used the foreach function on R to train multiple trees on different subsets of the data with a parallel backend from the "doParallel" package. At a cut-off level of 0.5, our random forest
+We tested random forests for 10, 20, and 300 trees. Given the size of the dataset, we used the foreach function on R to train multiple trees on different subsets of the data with a parallel backend from the "doParallel" package. At a cut-off level of 0.5, our random forest models all had a total accuracy rate of ~97%. But with the large number of non-song hits that we have, this is not realistice or a useful measure of accuracy. We want to look at the sensitivity or recall of the model, that is, how many songs have been correctly predicted as hits. 
+
+For our model with 10 trees, our in-sample sensitivity is 0.4254017 or 42% and out-of-sample sensitivity is 0.03981265 or 4%. Our mean of squared residuals was 0.01075844. What was more concerning was percentage of variance explained: -34.23. This indicated that our model was performing very poorly, and that we were better off our null model. Increasing the trees to 20 did not help that much. We got in-sample sensitivity of 0.4433818 or 44.3% and out-of-sample sensitivity is 0.04566745 or 4.5%. When we ran it for 300 trees, not much changed. We got percentage of variance explained as -6.46. Mean of squared residuals was 0.008532586. There was minute change in sensitivity, with in-sample increasing to 51.75% and out-of-sample increasing to 5.1%. 
+
+Given these results, our random forests model performed quite poorly. Due to computational constraints and little marginal increase in performance, we chose to not increase the number of trees in the model. 
 
 ## IV. Patterns 
 Principal Component Analysis (PCA) is a dimensionality reduction technique that can be used to identify patterns and trends in high-dimensional datasets. In the context of hit song prediction, we can use PCA to analyze how the audio and lyric features of top and bottom billboard hits have changed across decades.
