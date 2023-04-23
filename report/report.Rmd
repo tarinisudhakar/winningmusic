@@ -32,16 +32,25 @@ For the first question, we followed the methodology laid down by Middlebrook and
 
 *Logistic regression* models the probability of a binary outcome based on a set of input variables. In our case, the binary outcome is whether a song is a Billboard Top 100 hit, and the input variables are the various audio features extracted from the song. **We will train several logistic regression models using different subsets of features and evaluate their performance in terms of accuracy, precision, recall, and F1 score.**
 
-*Random forests*, is an ensemble-learning algorithm that combines multiple decision trees to improve predictive performance. Each decision tree is trained on a random subset of features and samples, and the final prediction is based on the majority vote of the individual trees. We will explore the use of random forests for hit song prediction and compare its performance with logistic regression.
+*Random forests* combines multiple decision trees to improve predictive performance. Each decision tree is trained on a random subset of features and samples, and the final prediction is based on the majority vote of the individual trees. We will explore the use of random forests for hit song prediction and compare its performance with logistic regression.
 
 For the second question, we evaluated how audio and lyric features have changed of hit songs over time. We compared the Top 10 Billboard hits with the Bottom 10 (90-100 ranks) using Principal Component Analysis. 
 
+##  III. Methods
+
+##  IV. Results
+
 ## III. Hit song prediction 
 
-## IV. Patterns 
-Principal Component Analysis (PCA) is a popular dimensionality reduction technique that can be used to identify patterns and trends in high-dimensional datasets. In the context of hit song prediction, we can use PCA to analyze how the audio and lyric features of top and bottom billboard hits have changed across decades.
+*Logistic Regression*
 
-First, we gather a large dataset of songs released over several decades, including both top and bottom billboard hits. We then extract various audio features such as tempo, loudness, and danceability, as well as lyric features such as sentiment and complexity, from the songs using the Spotify Web API and natural language processing techniques.
+*Random Forest*
+We tested random forests for 10, 20, 300, and 500 trees. Given the size of the dataset, we used the foreach function on R to train multiple trees on different subsets of the data with a parallel backend from the "doParallel" package. At a cut-off level of 0.5, our random forest
+
+## IV. Patterns 
+Principal Component Analysis (PCA) is a dimensionality reduction technique that can be used to identify patterns and trends in high-dimensional datasets. In the context of hit song prediction, we can use PCA to analyze how the audio and lyric features of top and bottom billboard hits have changed across decades.
+
+First, we gathered a large dataset of songs released over several decades, including both top and bottom billboard hits. We then extract various audio features such as tempo, loudness, and danceability, as well as lyric features such as sentiment and complexity, from the songs using the Spotify Web API and natural language processing techniques.
 
 Next, we use PCA to reduce the dimensionality of the dataset by projecting it onto a lower-dimensional subspace while preserving as much of the original variability as possible. This allows us to visualize the relationships between the different features and identify the most important factors that contribute to a song's success.
 
@@ -50,6 +59,8 @@ We can then plot the first two principal components against each other and color
 For example, we might observe that songs released in the 1960s have a different distribution of audio and lyric features than songs released in the 2010s. We might also observe that certain features, such as tempo or sentiment, are consistently more important for predicting a song's success across all decades.
 
 Overall, using PCA to analyze how the audio and lyric features of top and bottom billboard hits have changed across decades can provide valuable insights into the evolution of popular music and help inform future hit song predictions.
+
+##  V. Conclusion
 
 ## Appendix 1
 ### Data Sources
@@ -95,16 +106,6 @@ We obtain audio features of each song in our billboard data set using Spotify's 
 
 Observations unable to be found on Spotify are dropped from the data set. The final data set contain () observations and () variables.
 
-##  III. Methods
-
-
-##  IV. Results
-
-
-##  V. Conclusion
-
-
-##  VI. Appendix
 
 
 
