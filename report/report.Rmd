@@ -185,7 +185,7 @@ diags
 ```{r echo=FALSE}
 # average performance metrics across all folds
 summarize_all(diags, mean)
-remove(data_hits)
+remove(data_hits, hits_split, hits_test, hits_train, folds, test, train)
 ```
 
 From the performance metrics, we see that accuracy stays consistent at 99% on average, RMSE is about 5.29, and the AUC is at about 0.7. Although the accuracy score is high and RMSE is consistently low, the AUC indicates that performance can be further improved with a better model. 
@@ -297,7 +297,7 @@ confusion_in300 #51.75% in train set
 cat("In-sample sensitivity for 300 trees: ", 1353/(1353+1261))
 
 phat_test_bb1 = predict(bb100.forest, bb100_test) 
-yhat_test_bb1 = ifelse(phat_test_bb2 > 0.5, 1, 0) 
+yhat_test_bb1 = ifelse(phat_test_bb1 > 0.5, 1, 0) 
 confusion_out300 = table(y = bb100_test$hit, yhat = yhat_test_bb1) 
 confusion_out300 #5.1% in test set
 cat("Out-of-sample sensitivity for 300 trees: ", 44/(44+810))
