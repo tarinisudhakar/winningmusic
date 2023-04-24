@@ -54,10 +54,6 @@ For the first question, we followed the methodology laid down by Middlebrook and
 
 For the second question, we evaluated how audio and lyric features have changed of hit songs over time. We compared the Top 10 Billboard hits with the Bottom 10 (90-100 ranks) using Principal Component Analysis. 
 
-##  III. Methods
-
-##  IV. Results
-
 ## III. Hit song prediction 
 
 *Logistic Regression*
@@ -320,38 +316,13 @@ paste("Accuracy % of logistic regression: ", mean(bb100_test$hit == round(lr_pre
 paste("Area under curve of random forest: ", ROC_rf_auc)
 paste("Area under curve of logistic regression: ", ROC_lr_auc)
 ```
-
-
 ## IV. Patterns 
 Principal Component Analysis (PCA) is a dimensionality reduction technique that can be used to identify patterns and trends in high-dimensional datasets. In the context of hit song prediction, we can use PCA to analyze how the audio and lyric features of top billboard hits have changed across decades.
 
 First, we gathered a large dataset of songs released over several decades, including both top billboard hits. We then extract various audio features such as tempo, loudness, and danceability, as well as lyric features such as sentiment and complexity, from the songs using the Spotify Web API and natural language processing techniques. The complete data set contains the billboard top 100 hits from 1958-2015. Using the complete data set, we plot the correlation matrix for the acoustic and lyrical analysis variables, as presented below. From the matrix, as expected we see that acousticness and energy are negatively correlated while energy and loudness are positively correlated. Num_words, num_syllables, and num_lines are highly correlated, so only num_words was kept. Additionally, the various measures of sentiment (positive, negative, neutral, compound) are also highly correlated with each other, so compound_sentiment and neutral_sentiment were dropped. 
 
-For each decade, we first center and scale our data. Centering the data makes sure that the clustering algorithm focuses on the patterns and differences in the data, rather than the absolute values of each variable. Scaling the data makes sure that the PCA and clustering algorithms treats each variable equally, regardless of its magnitude or unit of measurement. 
-
-Next, we use PCA to reduce the dimensionality of the dataset by projecting it onto a lower-dimensional subspace while preserving as much of the original variability as possible. This allows us to visualize the relationships between the different features and identify the most important factors that contribute to a song's success. We generate 10 principal components of the data for each decade. We observe that P10 explains the majority of the data, with P10 values of 84, 84, 83, 84, and 81 for the 1960s, 1970s, 1980s, 1990s, and 2000s, respectively. Each decade is known to be defined for different genre of music. For each decade, we look at the first three principal components of the top 10 ranking songs for the decade to examine the acoustic and lyrical features of the songs during that era. The summary, plots, and tables of the PCA results for each decade can be found in the appendix.
-
-The 1960s were known for Rock ‘N Roll, Motown, and The British Invasion. Various types of Rock ‘N Roll were popular during this period such as Psychedelic Rock, Blues-Rock, and Progressive Rock. Popular singers/groups included The Beatles, Bob Dylan, The Monkees, and The Rolling Stones. We see that all three PCs are actually quite similar. They all include loudness, energy, liveness, a large number of word duplications, and negative sentiment. These may be capturing different groups of Rock music popular in this period. The lack of variation in the PC1-3 results may be attributed to that fact that there were not a variety of different genres popular during this period.
-
-The 1970s were known for Disco, Motown, Progressive Rock, Punk, and R&B. Disco was notably one of the biggets music trends of the decade. Popular singers/groups included Diana Ross, The Jackson 5, Elton John, and Marvin Gaye. PC1, PC2, and PC3 differ considerably from each other. PC1 is largely described by acousticness, instrumentalness, and positive sentiment, perhaps picking up the rise in R&B in this decade. PC2 is described with large number of duplicate words, negative sentiment, and acousticness, perhaps a grouping of punk music that was not large, but still present in the 1970s. And finally, PC3 is described by positive sentiment, valence, danceability, energy, and loudness. This is perhaps a clear nod to the great rise in disco during the 1970s.
-
-The 1980s were known for Pop, Heavy Metal, Glam rock, Hip-Hop, and Country. Popular singers/groups included Whitney Houston, Madonna, Dolly Parton, Michael Jackson, Lionel Ritchie, MC Hammer, and Bon Jovi. In the 1980's music was dramatically changed by the introduction of MTV (Music Television) where a greater importance was placed on the appearance of musicians and gimmicks became commonplace. Hip-Hop also came into the mainstream during this decade. Again, PC1, PC2, and PC3 differ considerably from each other. PC1 is described by a larger number of words, energy, loudness, liveness, and speechiness, perhaps picking up the rise in hip hop during this decade. PC2 is described by neutral sentiment a larger number of words, liveness, acousticness, and instrumentalness. This grouping is more difficult to pin point, though it may be a point to country music or a grouping of pop music during this period. And finally, PC3 is described by negative sentiment, loudness, energy, higher tempo, and liveness. This may be describing a heavy metal and/or a rock grouping during this decade. 
-
-The 1990s were known for Grunge, Alternative, Rap, Hip-Hop, Gangster Rap, Bubblegum Pop, Contemporary R&B, and Country. Popular singers/groups included Nirvana, MC Hammer, Britney Spears, Backstreet Boys, N'Sync, Red Hot Chili Peppers, 2Pac, Notorious B.I.G., and Guns & Roses. Very clearly, the 1990's was an era filled with all different genre's of music. PC1 is described by acousticness, positive sentiment, longer length, and higher flesch_index scores (that is, the song lyrics are not of high difficulty to understand). This grouping may be an description of Contemporary R&B or Country. PC2 is described by loudness, energy, valence, and positive sentiment, perhaps pointing to pop songs during this period. And PC3 is described by positiveness, liveness, acousticness, and speechiness, which would describe a grouping of the Contemporary R&B present in the 90s.
-
-The 2000s were known for Pop, Hip-Hop, R&B, and Rock. Popular singers/groups included Eminem, Kanye West, Nickelback, Beyoncé, Britney Spears, The Killers, and Linkin Park. The PCs all share energy and loudness features. However, PC1 is additionally described by a larger number of words, higher tempo, and more word duplications (repitition), perhaps an indication of the large presence of hip hop during this period. PC2 is additionally described by instrumentalness, liveness, valence, and negative sentiment, perhaps an indication of a section of Rock. And finally, PC3 is additionally described by liveness, higher tempo, more difficult words, and negative sentiment. This grouping is a but more difficult to pin down, though the grouping may again be referring to Rock, but perhaps a different variety (Rock was still very popular during this period with many different genres such as post-grunge, pop punk, post-hardcore, metalcore, and indie). But very clearly, the 2000s were defined by energy and loudness in their top hits.
-
-
-*************************** need help ******************************************************
-We can then plot the first two principal components against each other and color-code the points based on their decade of release. This visualization can help us identify how the audio and lyric features of top and bottom billboard hits have changed over time and whether there are any consistent patterns or trends.
-
-For example, we might observe that songs released in the 1960s have a different distribution of audio and lyric features than songs released in the 2010s. We might also observe that certain features, such as tempo or sentiment, are consistently more important for predicting a song's success across all decades.
-*********************************************************************************
-
-While tastes for different genre of music has changed across decades, we see that certain characteristics, such as energy and loudness, continue to be important features of chart topping hits. Overall, using PCA to analyze how the audio and lyric features of top billboard hits have changed across decades can provide valuable insights into the evolution of popular music and help inform future hit song predictions.
 ```{r all analysis, echo=FALSE}
-#Seeing an overall shift in music
-all_data <- read.csv("/Users/soojeechoi/Desktop/lyrics.csv") # 1958-2015
+all_data <- read.csv("https://raw.githubusercontent.com/tarinisudhakar/winningmusic/main/analysis/lyrics.csv") # 1958-2015
 
 #Changing data integer to numeric types
 all_data$danceability <- as.numeric(all_data$danceability)
@@ -365,7 +336,35 @@ all_data$num_lines <- as.numeric(all_data$num_lines)
 all_data$duration_ms <- as.numeric(all_data$duration_ms)
 all_data$mode <- as.numeric(all_data$mode)
 all_data$time_signature <- as.numeric(all_data$time_signature)
+
+#keep analysis columns
+cs <- all_data[,-(33)]
+cs <- cs[,-(18:19)]
+cs <- cs[,-(4:5)]
+cs <- cs[,-(1:2)]
+cs <- na.omit(cs) # must drop na observations
+cs <- cs[cs$position<=10,] #Top 10 only
+X <- cs[,-(1)] # Drop position
+
+# Center and scale the data
+X = scale(X, center=TRUE, scale=TRUE)
+
+# Extract the centers and scales from the rescaled data (which are named attributes)
+mu = attr(X,"scaled:center")
+sigma = attr(X,"scaled:scale")
+
+#Correlation matrix
+corr_matrix <- cor(X)
 ```
+
+```{r correlation matrix, echo=FALSE}
+ggcorrplot(corr_matrix)
+```
+For each decade, we first center and scale our data. Centering the data makes sure that the clustering algorithm focuses on the patterns and differences in the data, rather than the absolute values of each variable. Scaling the data makes sure that the PCA and clustering algorithms treats each variable equally, regardless of its magnitude or unit of measurement. 
+
+Next, we use PCA to reduce the dimensionality of the dataset by projecting it onto a lower-dimensional subspace while preserving as much of the original variability as possible. This allows us to visualize the relationships between the different features and identify the most important factors that contribute to a song's success. We generate 10 principal components of the data for each decade. We observe that P10 explains the majority of the data, with P10 values of 84, 84, 83, 84, and 81 for the 1960s, 1970s, 1980s, 1990s, and 2000s, respectively. Each decade is known to be defined for different genre of music. For each decade, we examine at the first three principal components of the top 10 ranking songs for the decade to examine the acoustic and lyrical features of the songs during that era. The summary and full PC tables of the PCA results for each decade can be found in the appendix.
+
+The 1960s were known for Rock ‘N Roll, Motown, and The British Invasion. Various types of Rock ‘N Roll were popular during this period such as Psychedelic Rock, Blues-Rock, and Progressive Rock. Popular singers/groups included The Beatles, Bob Dylan, The Monkees, and The Rolling Stones. We see that all three PCs are actually quite similar. They all include loudness, energy, liveness, a large number of word duplications, and negative sentiment. These may be capturing different types of Rock music popular in this period. The lack of variation in the PC1-3 results may be attributed to that fact that there were not a variety of different genres popular during this period.
 
 ```{r 1960s analysis, echo=FALSE}
 #Music by decade
@@ -398,10 +397,6 @@ corr_matrix_60s <- cor(X_60s)
 #Trying PCA
 pc_sm_60s = prcomp(X_60s, rank=10, center = TRUE, scale=TRUE)
 
-# overall variation
-summary_pc_sm_60s=summary(pc_sm_60s)
-plot_60s=plot(pc_sm_60s)
-
 loadings_summary_60s = pc_sm_60s$rotation %>%
   as.data.frame() %>%
   rownames_to_column('Category')
@@ -433,7 +428,10 @@ cluster2_songs_60s=which(clust_60s$cluster == 2)
 cluster3_songs_60s=which(clust_60s$cluster == 3)
 ```
 
-
+```{r 1960s results, echo=FALSE}
+loadings_summary_60s[c("Category","PC1","PC2","PC3")]
+```
+The 1970s were known for Disco, Motown, Progressive Rock, Punk, and R&B. Disco was notably one of the biggets music trends of the decade. Popular singers/groups included Diana Ross, The Jackson 5, Elton John, and Marvin Gaye. PC1, PC2, and PC3 differ considerably from each other. PC1 is largely described by acousticness, instrumentalness, and positive sentiment, perhaps picking up the rise in R&B in this decade. PC2 is described with large number of duplicate words, negative sentiment, and acousticness, perhaps a grouping of punk music that was not large, but still present in the 1970s. And finally, PC3 is described by positive sentiment, valence, danceability, energy, and loudness. This is perhaps a clear nod to the great rise in disco during the 1970s.
 
 ```{r 1970s analysis, echo=FALSE}
 #Music by decade
@@ -466,10 +464,6 @@ corr_matrix_70s <- cor(X_70s)
 #Trying PCA
 pc_sm_70s = prcomp(X_70s, rank=10, center = TRUE, scale=TRUE)
 
-# overall variation
-summary_pc_sm_70s=summary(pc_sm_70s)
-plot_70s=plot(pc_sm_70s)
-
 loadings_summary_70s = pc_sm_70s$rotation %>%
   as.data.frame() %>%
   rownames_to_column('Category')
@@ -501,6 +495,11 @@ cluster2_songs_70s=which(clust_70s$cluster == 2)
 cluster3_songs_70s=which(clust_70s$cluster == 3)
 ```
 
+```{r 1970s results, echo=FALSE}
+loadings_summary_70s[c("Category","PC1","PC2","PC3")]
+```
+
+The 1980s were known for Pop, Heavy Metal, Glam rock, Hip-Hop, and Country. Popular singers/groups included Whitney Houston, Madonna, Dolly Parton, Michael Jackson, Lionel Ritchie, MC Hammer, and Bon Jovi. In the 1980's music was dramatically changed by the introduction of MTV (Music Television) where a greater importance was placed on the appearance of musicians and gimmicks became commonplace. Hip-Hop also came into the mainstream during this decade. Again, PC1, PC2, and PC3 differ considerably from each other. PC1 is described by a larger number of words, energy, loudness, liveness, and speechiness, perhaps picking up the rise in hip hop during this decade. PC2 is described by neutral sentiment a larger number of words, liveness, acousticness, and instrumentalness. This grouping is more difficult to pin point, though it may be a point to country music or a grouping of pop music during this period. And finally, PC3 is described by negative sentiment, loudness, energy, higher tempo, and liveness. This may be describing a heavy metal and/or a rock grouping during this decade. 
 
 ```{r 1980s analysis, echo=FALSE}
 #Music by decade
@@ -529,13 +528,9 @@ X_80s = X_80s[,-(8)]
 #Sentiment is also highly correlated with itself. Dropping compound_sentiment and neutral_sentiment. 
 X_80s = X_80s[,-(3:4)]
 corr_matrix_80s <- cor(X_80s)
-X_80s = X_80s[,-(25)] #No variance in time_signature
+X_80s = X_80s[,-(21)] #No variance in time_signature
 #Trying PCA
 pc_sm_80s = prcomp(X_80s, rank=10, center = TRUE, scale=TRUE)
-
-# overall variation
-summary_pc_sm_80s=summary(pc_sm_80s)
-plot_80s=plot(pc_sm_80s)
 
 loadings_summary_80s = pc_sm_80s$rotation %>%
   as.data.frame() %>%
@@ -567,7 +562,11 @@ cluster1_songs_80s=which(clust_80s$cluster == 1)
 cluster2_songs_80s=which(clust_80s$cluster == 2) 
 cluster3_songs_80s=which(clust_80s$cluster == 3)
 ```
+```{r 1980s results, echo=FALSE}
+loadings_summary_80s[c("Category","PC1","PC2","PC3")]
+```
 
+The 1990s were known for Grunge, Alternative, Rap, Hip-Hop, Gangster Rap, Bubblegum Pop, Contemporary R&B, and Country. Popular singers/groups included Nirvana, MC Hammer, Britney Spears, Backstreet Boys, N'Sync, Red Hot Chili Peppers, 2Pac, Notorious B.I.G., and Guns & Roses. Very clearly, the 1990's was an era filled with all different genre's of music. PC1 is described by acousticness, positive sentiment, longer length, and higher flesch_index scores (that is, the song lyrics are not of high difficulty to understand). This grouping may be an description of Contemporary R&B or Country. PC2 is described by loudness, energy, valence, and positive sentiment, perhaps pointing to pop songs during this period. And PC3 is described by positiveness, liveness, acousticness, and speechiness, which would describe a grouping of the Contemporary R&B present in the 90s.
 
 ```{r 1990s analysis, echo=FALSE}
 #Music by decade
@@ -600,10 +599,6 @@ corr_matrix_90s <- cor(X_90s)
 #Trying PCA
 pc_sm_90s = prcomp(X_90s, rank=10, center = TRUE, scale=TRUE)
 
-# overall variation
-summary_pc_sm_90s=summary(pc_sm_90s)
-plot_90s=plot(pc_sm_90s)
-
 loadings_summary_90s = pc_sm_90s$rotation %>%
   as.data.frame() %>%
   rownames_to_column('Category')
@@ -635,6 +630,10 @@ cluster2_songs_90s=which(clust_90s$cluster == 2)
 cluster3_songs_90s=which(clust_90s$cluster == 3)
 ```
 
+```{r 1990s results, echo=FALSE}
+loadings_summary_90s[c("Category","PC1","PC2","PC3")]
+```
+The 2000s were known for Pop, Hip-Hop, R&B, and Rock. Popular singers/groups included Eminem, Kanye West, Nickelback, Beyoncé, Britney Spears, The Killers, and Linkin Park. The PCs all share energy and loudness features. However, PC1 is additionally described by a larger number of words, higher tempo, and more word duplications (repitition), perhaps an indication of the large presence of hip hop during this period. PC2 is additionally described by instrumentalness, liveness, valence, and negative sentiment, perhaps an indication of a section of Rock. And finally, PC3 is additionally described by liveness, higher tempo, more difficult words, and negative sentiment. This grouping is a but more difficult to pin down, though the grouping may again be referring to Rock, but perhaps a different variety (Rock was still very popular during this period with many different genres such as post-grunge, pop punk, post-hardcore, metalcore, and indie). But very clearly, the 2000s were defined by energy and loudness in their top hits.
 
 ```{r 2000s analysis, echo=FALSE}
 #Music by decade
@@ -667,10 +666,6 @@ corr_matrix_00s <- cor(X_00s)
 #Trying PCA
 pc_sm_00s = prcomp(X_00s, rank=10, center = TRUE, scale=TRUE)
 
-# overall variation
-summary_pc_sm_00s=summary(pc_sm_00s)
-plot_00s=plot(pc_sm_00s)
-
 loadings_summary_00s = pc_sm_00s$rotation %>%
   as.data.frame() %>%
   rownames_to_column('Category')
@@ -702,13 +697,15 @@ cluster2_songs_00s=which(clust_00s$cluster == 2)
 cluster3_songs_00s=which(clust_00s$cluster == 3)
 ```
 
-
-
+```{r 2000s results, echo=FALSE}
+loadings_summary_00s[c("Category","PC1","PC2","PC3")]
+```
 ##  V. Conclusion
+While tastes for different genre of music has changed across decades, we see that certain characteristics, such as energy and loudness, continue to be important features of chart topping hits. We also observe variations in PCA PC groupings that arise as different genres of music emerged through the decades. Overall, using PCA to analyze how the audio and lyric features of top billboard hits have changed across decades can provide valuable insights into the evolution of popular music and help inform future hit song predictions.
 
 ## Appendix 1
 ### Data Sources
-The data set analyzed the lyrics of Billboard's Top 100 songs from 1950-2015 using a variety of Natural Language Processing techniques. The variables obtained from this data set are presented below:
+The publicly available data set by Github user `KevinSchaich` analyzed the lyrics of Billboard's Top 100 songs from 1950-2015 using a variety of Natural Language Processing techniques. The description of the variables obtained from this data set are presented below:
 
 * year: Release year of the song
 * position: Position of Billboard's Top 100 for the given year
@@ -747,3 +744,35 @@ We obtain audio features of each song in our billboard data set using Spotify's 
 * tempo: The overall estimated tempo of a track in beats per minute (BPM).
 * duration_ms: The duration of the track in milliseconds.
 * time_signature: An estimated overall time signature of a track. The time signature (meter) is a notational convention to specify how many beats are in each bar (or measure).
+
+
+## Appendix 2
+### PCA 1960s 
+```{r appendix 1960s, echo=FALSE}
+summary(pc_sm_60s)
+loadings_summary_60s
+```
+
+### PCA 1970s 
+```{r appendix 1970s, echo=FALSE}
+summary(pc_sm_70s)
+loadings_summary_70s
+```
+
+### PCA 1980s 
+```{r appendix 1980s, echo=FALSE}
+summary(pc_sm_80s)
+loadings_summary_80s
+```
+
+### PCA 1990s 
+```{r appendix 1990s, echo=FALSE}
+summary(pc_sm_90s)
+loadings_summary_90s
+```
+
+### PCA 2000s 
+```{r appendix 2000s, echo=FALSE}
+summary(pc_sm_00s)
+loadings_summary_00s
+```
