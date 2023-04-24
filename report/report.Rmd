@@ -181,7 +181,8 @@ diags
 
 ```{r echo=FALSE}
 # average performance metrics across all folds
-summarize_all(cv_diags, mean)
+summarize_all(diags, mean)
+remove(data_hits)
 ```
 
 From the performance metrics, we see that accuracy stays consistent at 99% on average, RMSE is about 5.29, and the AUC is at about 0.7. Although the accuracy score is high and RMSE is consistently low, the AUC indicates that performance can be further improved with a better model. 
@@ -191,12 +192,12 @@ We tested random forests for 10, 20, and 300 trees. We split our dataset into a 
 
 For our model with 10 trees, our in-sample sensitivity is 0.4254017 or 42% and out-of-sample sensitivity is 0.03981265 or 4%. Our out-of-sample RMSE was 0.0942759. What was more concerning was percentage of variance explained: -34.23. This indicated that our model was performing very poorly, and that we were better off our null model. Increasing the trees to 20 did not help that much. We got in-sample sensitivity of 0.4433818 or 44.3% and out-of-sample sensitivity is 0.04566745 or 4.5%. Out-of-sample RMSE was 0.09235341. When we ran it for 300 trees, not much changed. We got percentage of variance explained as -6.46. Out-of-sample RMSE was again similar to the other models: 0.09063623. There was minute change in sensitivity, with in-sample increasing to 51.75% and out-of-sample increasing to 5.1%. 
 
-Given these results, our random forests model performed quite poorly. Due to computational constraints and little marginal increase in performance, we chose to not increase the number of trees in the model. We also modelled a single decision tree, where we got an out-of-sample RMSE of 0.09712917. 
+Given these results, our random forests model performed quite poorly. Due to computational constraints and little marginal increase in performance, we chose to not increase the number of trees in the model. We also modeled a single decision tree, where we got an out-of-sample RMSE of 0.09712917. 
 
 
 ```{r echo=FALSE}
 #Splitting into training and testing data
-hits <- read.csv("~/Documents/Coding/winningmusic/hits.csv")
+hits <- read.csv("../analysis/hits.csv")
   
 bb100_split <- initial_split(hits, prop. = 0.8)
 bb100_train <- training(bb100_split)
@@ -301,6 +302,22 @@ cat("Out-of-sample sensitivity for 300 trees: ", 44/(44+810))
 vi = varImpPlot(bb100.forest, type=1) #valence is the most important 
 
 ```
+
+```{r echo=FALSE}
+lr_prediction = predict(model1, newdata = bb100_test, type = "response")
+ROC_rf <- roc(bb100_test$hit, phat_test_bb10)
+ROC_lr <- roc(bb100_test$hit, lr_prediction)
+ROC_rf_auc <- auc(ROC_rf)
+ROC_lr_auc <- auc(ROC_lr)
+plot(ROC_rf, col = "green", main = "ROC For Random Forest (GREEN) vs Logistic Regression (RED)")
+lines(ROC_lr, col = "red")
+
+paste("Accuracy % of random forest: ", mean(bb100_test$hit == round(phat_test_bb10, digits = 0)))
+paste("Accuracy % of logistic regression: ", mean(bb100_test$hit == round(lr_prediction, digits = 0)))
+paste("Area under curve of random forest: ", ROC_rf_auc)
+paste("Area under curve of logistic regression: ", ROC_lr_auc)
+```
+
 
 ## IV. Patterns 
 Principal Component Analysis (PCA) is a dimensionality reduction technique that can be used to identify patterns and trends in high-dimensional datasets. In the context of hit song prediction, we can use PCA to analyze how the audio and lyric features of top and bottom billboard hits have changed across decades.
