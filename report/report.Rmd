@@ -34,7 +34,7 @@ library(tidyr)
 ```
 
 ##  I. Abstract
-How do you make a hit song? Intuitively, a hit song should have a good beat, a catchy hook, and not-too-complicated lyrics. But we can do better than that, given the amount of data surrounding us. Spotify has been able to break a song into features such as energy, tempo, acoustics, and much more. Using these features for songs released between 1985 to 2015, we predict whether a song will make to Billboard Top 100 in the USA. We run both a logistic regression and random forests model: random forests emerges as the clear winner with X% accuracy. We also evaluate how features of a top 10 Billboard hit change over this time period, including lyric analysis. Our biggest contribution is creating a dataset with Billboard hit songs and non-hit songs from 1985 to 2015, containing Spotify audio features.  
+How do you make a hit song? Intuitively, a hit song should have a good beat, a catchy hook, and not-too-complicated lyrics. But we can do better than that, given the amount of data surrounding us. Spotify has been able to break a song into features such as energy, tempo, acoustics, and much more. Using these features for songs released between 1985 to 2015, we predict whether a song will make to Billboard Top 100 in the USA. We run both a logistic regression and random forests model: random forests emerges as the clear winner with X% accuracy. We also evaluate how features of a top 10 Billboard hit change over this time period, including lyric analysis. We observe that PCA does manage to group songs by lyric and acoustic features representing the popular music genres of each decade. Our biggest contribution is creating a dataset with Billboard hit songs songs from 1985 to 2015, containing Spotify audio features.  
 
 ##  II. Introduction
 
@@ -349,6 +349,23 @@ For example, we might observe that songs released in the 1960s have a different 
 *********************************************************************************
 
 While tastes for different genre of music has changed across decades, we see that certain characteristics, such as energy and loudness, continue to be important features of chart topping hits. Overall, using PCA to analyze how the audio and lyric features of top billboard hits have changed across decades can provide valuable insights into the evolution of popular music and help inform future hit song predictions.
+```{r all analysis, echo=FALSE}
+#Seeing an overall shift in music
+all_data <- read.csv("/Users/soojeechoi/Desktop/lyrics.csv") # 1958-2015
+
+#Changing data integer to numeric types
+all_data$danceability <- as.numeric(all_data$danceability)
+all_data$energy <- as.numeric(all_data$energy)
+all_data$key <- as.numeric(all_data$key)
+all_data$loudness <- as.numeric(all_data$loudness)
+all_data$difficult_words <- as.numeric(all_data$difficult_words)
+all_data$num_dupes <- as.numeric(all_data$num_dupes)
+all_data$num_words <- as.numeric(all_data$num_words)
+all_data$num_lines <- as.numeric(all_data$num_lines)
+all_data$duration_ms <- as.numeric(all_data$duration_ms)
+all_data$mode <- as.numeric(all_data$mode)
+all_data$time_signature <- as.numeric(all_data$time_signature)
+```
 
 ```{r 1960s analysis, echo=FALSE}
 #Music by decade
