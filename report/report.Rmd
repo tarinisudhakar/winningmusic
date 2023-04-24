@@ -34,7 +34,12 @@ library(tidyr)
 ```
 
 ##  I. Abstract
-How do you make a hit song? Intuitively, a hit song should have a good beat, a catchy hook, and not-too-complicated lyrics. But we can do better than that, given the amount of data surrounding us. Spotify has been able to break a song into features such as energy, tempo, acoustics, and much more. Using these features for songs released between 1985 to 2015, we predict whether a song will make to Billboard Top 100 in the USA. We run both a logistic regression and random forests model: random forests emerges as the clear winner with X% accuracy. We also evaluate how features of a top 10 Billboard hit change over this time period, including lyric analysis. We observe that PCA does manage to group songs by lyric and acoustic features representing the popular music genres of each decade. Our biggest contribution is creating a dataset with Billboard hit songs songs from 1985 to 2015, containing Spotify audio features.  
+
+How do you make a hit song? Intuitively, a hit song should have a good beat, a catchy hook, and not-too-complicated lyrics. But we can do better than that, given the amount of data surrounding us. Spotify has been able to break a song into quantitative features such as energy, tempo, acoustics, and much more. 
+
+Using these features for songs released between 1985 to 2015, we predict whether a song will make the Billboard Top 100 in the USA. We run both a logistic regression and random forests model. Unfortunately, while both models have a high total accuracy, they are unable to predict well whether a song will be a hit. Random forests get 5% as the best sensitivity rate.
+
+We also evaluate how features of a Top 10 Billboard hit change over this time period, including lyric analysis. We observe that PCA does manage to group songs by lyric and acoustic features representing the popular music genres of each decade. Our biggest contribution is compiling a dataset with songs from 1958 to 2015, containing Spotify audio features and lyric features for Billboard hit songs.
 
 ##  II. Introduction
 
@@ -48,13 +53,13 @@ We asked two questions:
   
 For the first question, we followed the methodology laid down by Middlebrook and Sheik ([2019](https://www.arxiv-vanity.com/papers/1908.08609/)). They build four prediction models for songs from 1985 to 2015: logistic regression, neural network, random forests, and support vector machine. We use logistic regression and random forests for our analysis. 
 
-*Logistic regression* models the probability of a binary outcome based on a set of input variables. In our case, the binary outcome is whether a song is a Billboard Top 100 hit, and the input variables are the various audio features extracted from the song. **We will train several logistic regression models using different subsets of features and evaluate their performance in terms of accuracy, precision, recall, and F1 score.**
+*Logistic regression* models the probability of a binary outcome based on a set of input variables. In our case, the binary outcome is whether a song is a Billboard Top 100 hit, and the input variables are the various audio features extracted from the song. **We will train a logistic regression model using different subsets of features and evaluate their performance in terms of accuracy, precision, recall, and F1 score.**
 
 *Random forests* combines multiple decision trees to improve predictive performance. Each decision tree is trained on a random subset of features and samples, and the final prediction is based on the majority vote of the individual trees. We will explore the use of random forests for hit song prediction and compare its performance with logistic regression.
 
-For the second question, we evaluated how audio and lyric features have changed of hit songs over time. We compared the Top 10 Billboard hits with the Bottom 10 (90-100 ranks) using Principal Component Analysis. 
+For the second question, we evaluated how audio and lyric features have changed of Top 10 Billboard hits using Principal Component Analysis. 
 
-## III. Hit song prediction 
+## III. Predicting a Billboard Top 100 hit song 
 
 *Logistic Regression*
 
@@ -316,7 +321,7 @@ paste("Accuracy % of logistic regression: ", mean(bb100_test$hit == round(lr_pre
 paste("Area under curve of random forest: ", ROC_rf_auc)
 paste("Area under curve of logistic regression: ", ROC_lr_auc)
 ```
-## IV. Patterns 
+## IV. Identifying patterns in a Top 10 hit song 
 Principal Component Analysis (PCA) is a dimensionality reduction technique that can be used to identify patterns and trends in high-dimensional datasets. In the context of hit song prediction, we can use PCA to analyze how the audio and lyric features of top billboard hits have changed across decades.
 
 First, we gathered a large dataset of songs released over several decades, including both top billboard hits. We then extract various audio features such as tempo, loudness, and danceability, as well as lyric features such as sentiment and complexity, from the songs using the Spotify Web API and natural language processing techniques. The complete data set contains the billboard top 100 hits from 1958-2015. Using the complete data set, we plot the correlation matrix for the acoustic and lyrical analysis variables, as presented below. From the matrix, as expected we see that acousticness and energy are negatively correlated while energy and loudness are positively correlated. Num_words, num_syllables, and num_lines are highly correlated, so only num_words was kept. Additionally, the various measures of sentiment (positive, negative, neutral, compound) are also highly correlated with each other, so compound_sentiment and neutral_sentiment were dropped. 
@@ -700,8 +705,16 @@ cluster3_songs_00s=which(clust_00s$cluster == 3)
 ```{r 2000s results, echo=FALSE}
 loadings_summary_00s[c("Category","PC1","PC2","PC3")]
 ```
+
 ##  V. Conclusion
-While tastes for different genre of music has changed across decades, we see that certain characteristics, such as energy and loudness, continue to be important features of chart topping hits. We also observe variations in PCA PC groupings that arise as different genres of music emerged through the decades. Overall, using PCA to analyze how the audio and lyric features of top billboard hits have changed across decades can provide valuable insights into the evolution of popular music and help inform future hit song predictions.
+
+*Hit song prediction* 
+For the logistic regression, the baseline model's performance is comparable to the refined model's performance. The refined model has a slightly higher AUC, but there is no significant improvement in total accuracy or RMSE. Because the improvement in the model is not significant enough to justify losing parsimony from the baseline model, we conclude that the baseline model is the best choice for logistic regression modeling. 
+
+In the random forests model, increasing the number of trees led to marginal improvement in the model with large jumps in computational burden. The RMSE for random forests with 300 trees barely differed from that of a single decision tree. But it did get a sensitivity rate of 5%, whereas the logistic regression failed to predict any hit songs. We understand this is due to a major class imbalance, where we have several more observations of non-hit songs than we have of hit songs. Once we correct for that, we can tweak the random forests model by playing with maximum depth, Gini index and more, 
+
+*Patterns in Top 10 hits* 
+While tastes for different genre of music has changed across decades, we see that certain characteristics, such as energy and loudness, continue to be important features of chart topping hits. We also observe variations in principal components that arise as different genres of music emerged through the decades. Overall, using PCA to analyze how the audio and lyric features of Top Billboard hits have changed across decades can provide valuable insights into the evolution of popular music and help inform future hit song predictions.
 
 ## Appendix 1
 ### Data Sources
